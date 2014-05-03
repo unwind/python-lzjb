@@ -13,45 +13,14 @@ MATCH_MAX = ((1 << MATCH_BITS) + (MATCH_MIN - 1))
 OFFSET_MASK = ((1 << (16 - MATCH_BITS)) - 1)
 LEMPEL_SIZE_BASE = 1024
 
-class Instream(object):
-	def __init__(self, s):
-		self._string = s
-		self._pos = 0
-		self._unbuffer = []
 
-	def size(self):
-		return len(self._string)
-
-	def get(self):
-		if len(self._unbuffer) > 0:
-			return self._unbuffer.pop()
-		if self._pos < len(self._string):
-			r = self._string[self._pos]
-			self._pos += 1
-			return r
-		return None
-
-	def push(self, char):
-		self._unbuffer.extend(char)
-
-
-def compress(s, compression = 1, c_compatible = True):
+def compress(s):
 	LEMPEL_SIZE = LEMPEL_SIZE_BASE
-	EXPAND = True
-	if compression != 1:
-		LEMPEL_SIZE *= 2
-		compression = max(1, min(compression, 9)) - 1
-		EXPAND = 1 << int(math.floor(compression / 2))
-		if compression & 1:
-			EXPAND = round(EXPAND * 1.5)
-		if compression >= 2 and compression <= 4:
-			EXPAND += 1
 
-	out = cStringIO.StringIO()
-	src = Instream(s)
+	dst = cStringIO.StringIO()
 
-	# Encode input size.
-	size = src.size()
+	# Encode input size. This uses a variable-length encoding.
+	size = len(s)
 	if size:
 		sbytes = []
 		size += 1
@@ -62,8 +31,28 @@ def compress(s, compression = 1, c_compatible = True):
 				break
 		sbytes[0] |= 0x80
 		for sb in reversed(sbytes):
-			out.write(chr(sb))
-		print out.getvalue()
+			dst.write(chr(sb))
+
+	lempel = [0] * LEMPEL_SIZE
+	copymask = 1 << (NBBY - 1)
+	src = 0 # Current input offset.
+	while src < len(s):
+		copymask <<= 1
+		if (copymask == (1 << NBBY)):
+			copymask = 1
+			copymap = dst
+			dst.write(chr(0))
+		if src > len(s) - MATCH_MAX:
+			out.write(s[src])
+			src += 1
+			continue
+		hsh = (ord(s[src]) << 16) + (ord(s[src + 1]) << 8) + ord(s[src + 2])
+		hsh += hsh >> 9
+		hsh += hsh >> 5
+		hsh &= LEMPEL_SIZE - 1
+		offset = (src - lempel[hsh]) & OFFSET_MASK
+		lempel[hsh] = src
+
 
 if __name__ == "__main__":
 	compress(18 * "whatever ever is what this ever?")
