@@ -3,7 +3,6 @@
 # An attempt at re-implementing LZJB compression in native Python.
 #
 
-import cStringIO
 import math
 
 NBBY = 8
@@ -21,18 +20,18 @@ def compress(s):
 	dst = []
 
 	# Encode input size. This uses a variable-length encoding.
-	size = len(s)
-	if size:
-		sbytes = []
-		size += 1
-		while True:
-			sbytes.append(size & 0x7f)
-			size = int(math.floor(size / 128))
-			if size == 0:
-				break
-		sbytes[0] |= 0x80
-		for sb in reversed(sbytes):
-			dst.append(sb)
+#	size = len(s)
+#	if size:
+#		sbytes = []
+#		size += 1
+#		while True:
+#			sbytes.append(size & 0x7f)
+#			size = int(math.floor(size / 128))
+#			if size == 0:
+#				break
+#		sbytes[0] |= 0x80
+#		for sb in reversed(sbytes):
+#			dst.append(sb)
 
 	lempel = [0] * LEMPEL_SIZE
 	copymask = 1 << (NBBY - 1)
@@ -66,11 +65,43 @@ def compress(s):
 		else:
 			dst.append(ord(s[src]))
 			src += 1
-	print dst
 	# Now implode the list of codepoints into an actual string.
 	return "".join(map(chr, dst))
 
 
+def decompress(s):
+	src = 0
+	dst = ""
+	copymask = 1 << (NBBY - 1)
+	while src < len(s):
+		copymask <<= 1
+		if copymask == (1 << NBBY):
+			copymask = 1
+			copymap = ord(s[src])
+			src += 1
+		if copymap & copymask:
+			mlen = (ord(s[src]) >> (NBBY - MATCH_BITS)) + MATCH_MIN
+			offset = ((ord(s[src]) << NBBY) | ord(s[src + 1])) & OFFSET_MASK
+			src += 2
+			cpy = len(dst) - offset
+			print "src=%u mlen=%u offset=%u cpy=%u" % (src, mlen, offset, cpy)
+			if cpy < 0:
+				print "Decompression failed"
+				return None
+			while mlen > 0:
+				dst += dst[cpy]
+				cpy += 1
+				mlen -= 1
+		else:
+			dst += s[src]
+			src += 1
+	return dst
+
+
 if __name__ == "__main__":
-	r = compress(18 * "whatever ever is what this ever?")
-	print len(r)
+	data = 18 * "whatever ever is what this ever?"
+	compressed = compress(data)
+	print "%u -> %u (%.2f%%)" % (len(data), len(compressed), 100.0 * len(compressed) / len(data))
+	decompressed = decompress(compressed)
+	print len(decompressed)
+	print data == decompressed
