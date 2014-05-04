@@ -1,7 +1,7 @@
 lzjb
 ====
-This is a port of [Jeff Bonwick's](http://en.wikipedia.org/wiki/Jeff_Bonwick) [lzjb compression algorithm](http://en.wikipedia.org/wiki/LZJB) in pure Python.
-The compression is used in the ZFS filesystem.
+This is a port of [Jeff Bonwick's](http://en.wikipedia.org/wiki/Jeff_Bonwick) [lzjb compression algorithm](http://en.wikipedia.org/wiki/LZJB) to pure Python.
+This compression scheme is used in the ZFS filesystem.
 
 One of its main features is very small memory requirements for de-compression.
 This can make it a suitable choice when adding compression in memory-constrained environments, such as in embedded development.
@@ -17,14 +17,14 @@ This was transcribed into Python based on:
 Status
 ======
 It's very early days for this code.
-There is a lot of work do be done to bring this into anything near "production quality":
+There is a lot of work to be done to bring this into anything near "production quality":
 
 - Proper Python packaging (setup.py, and so on)
-- Test framework
+- Test framework (including two-way testing against the C code)
 - Benchmarking/optimization
 
 
 Performance
 ===========
 The main goal when implementing this has been correctness and (sort of) clarity by closely following the original C code.
-On my not-so-hot laptop (Intel® Core™ i5 CPU M 480 @ 2.67GHz) it currently achieves around a measly 1.1 MB/s when compressing.
+On my not-so-hot laptop (Intel® Core™ i5 M 480 @ 2.67GHz) it currently achieves around 1.1 MB/s when compressing.
