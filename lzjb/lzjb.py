@@ -4,6 +4,8 @@
 #
 
 import math
+import sys
+import time
 
 NBBY = 8
 MATCH_BITS = 6
@@ -137,10 +139,18 @@ def decompress(s, with_size = True):
 
 
 if __name__ == "__main__":
-	data = 18 * "whatever ever is what this ever?"
-	compressed = compress(data)
-	print "%u -> %u (%.2f%%)" % (len(data), len(compressed), 100.0 * len(compressed) / len(data))
-	print "data size was %u (encoded in %u bytes)" % decompressed_size(compressed)
-	decompressed = decompress(compressed)
-	print len(decompressed)
-	print data == decompressed
+	for a in sys.argv[1:]:
+		if a.startswith("-"):
+			print "**Ignoring unknown option '%s'" % a
+		else:
+			try:
+				inf = open(a, "rb")
+				data = inf.read()
+				inf.close()
+				print "Loaded %u bytes from '%s'" % (len(data), a)
+				t0 = time.clock()
+				compr = compress(data)
+				elapsed = time.clock() - t0
+				print " Compressed to %u bytes, %.2f%% in %s s" % (len(compr), 100.0 * len(compr) / len(data), elapsed)
+			except:
+				print "**Failed to open '%s'" % a
