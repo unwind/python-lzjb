@@ -151,6 +151,7 @@ if __name__ == "__main__":
 				t0 = time.clock()
 				compr = compress(data)
 				elapsed = time.clock() - t0
-				print " Compressed to %u bytes, %.2f%% in %s s" % (len(compr), 100.0 * len(compr) / len(data), elapsed)
+				rate = len(data) / (1024 * 1024 * elapsed)
+				print " Compressed to %u bytes, %.2f%% in %s s [%.1f MB/s]" % (len(compr), 100.0 * len(compr) / len(data), elapsed, rate)
 			except:
 				print "**Failed to open '%s'" % a
