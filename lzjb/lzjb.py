@@ -147,11 +147,15 @@ if __name__ == "__main__":
 				inf = open(a, "rb")
 				data = inf.read()
 				inf.close()
-				print "Loaded %u bytes from '%s'" % (len(data), a)
-				t0 = time.clock()
-				compr = compress(data)
-				elapsed = time.clock() - t0
-				rate = len(data) / (1024 * 1024 * elapsed)
-				print " Compressed to %u bytes, %.2f%% in %s s [%.1f MB/s]" % (len(compr), 100.0 * len(compr) / len(data), elapsed, rate)
 			except:
 				print "**Failed to open '%s'" % a
+				continue
+			print "Loaded %u bytes from '%s'" % (len(data), a)
+			t0 = time.clock()
+			compr = compress(data)
+			elapsed = time.clock() - t0
+			rate = len(data) / (1024 * 1024 * elapsed)
+			print " Compressed to %u bytes, %.2f%% in %s s [%.1f MB/s]" % (len(compr), 100.0 * len(compr) / len(data), elapsed, rate)
+			decompr = decompress(compr)
+			if decompr != data:
+				print "**Decompression failed!"
