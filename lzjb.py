@@ -52,7 +52,6 @@ def compress(s, with_size = True):
 		hsh += hsh >> 5
 		hsh &= LEMPEL_SIZE - 1
 		offset = (src - lempel[hsh]) & OFFSET_MASK
-		print "src=%u hsh=0x%04x offset=%u" % (src, hsh, offset)
 		lempel[hsh] = src
 		cpy = src - offset
 		if cpy >= 0 and cpy != src and s[src:src+3] == s[cpy:cpy+3]:
@@ -106,9 +105,7 @@ def decompress(s, with_size = True):
 			offset = ((ord(s[src]) << NBBY) | ord(s[src + 1])) & OFFSET_MASK
 			src += 2
 			cpy = len(dst) - offset
-			print "src=%u mlen=%u offset=%u cpy=%u" % (src, mlen, offset, cpy)
 			if cpy < 0:
-				print "Decompression failed"
 				return None
 			while mlen > 0:
 				dst += dst[cpy]
