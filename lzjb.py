@@ -13,25 +13,26 @@ OFFSET_MASK = ((1 << (16 - MATCH_BITS)) - 1)
 LEMPEL_SIZE_BASE = 1024
 
 
-def compress(s):
+def compress(s, with_size = True):
 	LEMPEL_SIZE = LEMPEL_SIZE_BASE
 
 	# During compression, treat output string as list of code points.
 	dst = []
 
 	# Encode input size. This uses a variable-length encoding.
-#	size = len(s)
-#	if size:
-#		sbytes = []
-#		size += 1
-#		while True:
-#			sbytes.append(size & 0x7f)
-#			size = int(math.floor(size / 128))
-#			if size == 0:
-#				break
-#		sbytes[0] |= 0x80
-#		for sb in reversed(sbytes):
-#			dst.append(sb)
+	if with_size:
+		size = len(s)
+		if size:
+			sbytes = []
+			size += 1
+			while True:
+				sbytes.append(size & 0x7f)
+				size = int(math.floor(size / 128))
+				if size == 0:
+					break
+			sbytes[0] |= 0x80
+			for sb in reversed(sbytes):
+				dst.append(sb)
 
 	lempel = [0] * LEMPEL_SIZE
 	copymask = 1 << (NBBY - 1)
@@ -69,8 +70,29 @@ def compress(s):
 	return "".join(map(chr, dst))
 
 
-def decompress(s):
+def decompressed_size(s):
+	dstSize = 0
 	src = 0
+	# Extract prefixed encoded size, if present.
+	while True:
+		c = ord(s[src])
+		src += 1
+		if (c & 0x80):
+			dstSize |= c & 0x7f
+			break
+		dstSize = (dstSize | c) << 7
+	dstSize -= 1	# -1 means "not known".		
+	return (dstSize, src)
+
+
+def decompress(s, with_size = True):
+	src = 0
+	dstSize = 0
+	if with_size:
+		dstSize, src = decompressed_size(s)
+		if dstSize < 0:
+			return None
+
 	dst = ""
 	copymask = 1 << (NBBY - 1)
 	while src < len(s):
@@ -102,6 +124,7 @@ if __name__ == "__main__":
 	data = 18 * "whatever ever is what this ever?"
 	compressed = compress(data)
 	print "%u -> %u (%.2f%%)" % (len(data), len(compressed), 100.0 * len(compressed) / len(data))
+	print "data size was %u (encoded in %u bytes)" % decompressed_size(compressed)
 	decompressed = decompress(compressed)
 	print len(decompressed)
 	print data == decompressed
