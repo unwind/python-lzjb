@@ -17,7 +17,8 @@ LEMPEL_SIZE_BASE = 1024
 def compress(s):
 	LEMPEL_SIZE = LEMPEL_SIZE_BASE
 
-	dst = cStringIO.StringIO()
+	# During compression, treat output string as list of code points.
+	dst = []
 
 	# Encode input size. This uses a variable-length encoding.
 	size = len(s)
@@ -31,7 +32,7 @@ def compress(s):
 				break
 		sbytes[0] |= 0x80
 		for sb in reversed(sbytes):
-			dst.write(chr(sb))
+			dst.append(sb)
 
 	lempel = [0] * LEMPEL_SIZE
 	copymask = 1 << (NBBY - 1)
@@ -40,10 +41,10 @@ def compress(s):
 		copymask <<= 1
 		if (copymask == (1 << NBBY)):
 			copymask = 1
-			copymap = dst
-			dst.write(chr(0))
+			copymap = len(dst)
+			dst.append(0)
 		if src > len(s) - MATCH_MAX:
-			out.write(s[src])
+			dst.append(ord(s[src]))
 			src += 1
 			continue
 		hsh = (ord(s[src]) << 16) + (ord(s[src + 1]) << 8) + ord(s[src + 2])
@@ -51,8 +52,25 @@ def compress(s):
 		hsh += hsh >> 5
 		hsh &= LEMPEL_SIZE - 1
 		offset = (src - lempel[hsh]) & OFFSET_MASK
+		print "src=%u hsh=0x%04x offset=%u" % (src, hsh, offset)
 		lempel[hsh] = src
+		cpy = src - offset
+		if cpy >= 0 and cpy != src and s[src:src+3] == s[cpy:cpy+3]:
+			dst[copymap] = dst[copymap] | copymask
+			for mlen in xrange(MATCH_MIN, MATCH_MAX):
+				if s[src + mlen] != s[cpy + mlen]:
+					break
+			dst.append(((mlen - MATCH_MIN) << (NBBY - MATCH_BITS)) | (offset >> NBBY))
+			dst.append(offset & 0xff)
+			src += mlen
+		else:
+			dst.append(ord(s[src]))
+			src += 1
+	print dst
+	# Now implode the list of codepoints into an actual string.
+	return "".join(map(chr, dst))
 
 
 if __name__ == "__main__":
-	compress(18 * "whatever ever is what this ever?")
+	r = compress(18 * "whatever ever is what this ever?")
+	print len(r)
