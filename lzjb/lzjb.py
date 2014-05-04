@@ -14,6 +14,10 @@ LEMPEL_SIZE_BASE = 1024
 
 
 def compress(s, with_size = True):
+	"""Compress the source string, returning a string holding the compressed data.
+	If with_size is not false, the length of the input string is prepended to the result,
+	in a special variable-length binary encoding.
+	"""
 	LEMPEL_SIZE = LEMPEL_SIZE_BASE
 
 	# During compression, treat output string as list of code points.
@@ -70,6 +74,12 @@ def compress(s, with_size = True):
 
 
 def decompressed_size(s):
+	"""
+	Returns a tuple (original length, length of size) from a string of compressed data.
+
+	The original length is the length of the string passed to compress(), and length of
+	size is the number of bytes that are used in s to express this size.
+	"""
 	dstSize = 0
 	src = 0
 	# Extract prefixed encoded size, if present.
@@ -85,6 +95,13 @@ def decompressed_size(s):
 
 
 def decompress(s, with_size = True):
+	"""
+	Decompress a string of compressed data, returning the original string.
+
+	The value of with_size must match the value given when s was generated
+	by compress().
+	"""
+
 	src = 0
 	dstSize = 0
 	if with_size:
