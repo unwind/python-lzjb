@@ -27,6 +27,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import cProfile
 import math
 import sys
 import time
@@ -49,7 +50,7 @@ def compress(s, with_size = True):
 	LEMPEL_SIZE = LEMPEL_SIZE_BASE
 
 	# During compression, treat output string as list of code points.
-	dst = []
+	dst = bytearray()
 
 	# Encode input size. This uses a variable-length encoding.
 	if with_size:
@@ -163,9 +164,13 @@ def decompress(s, with_size = True):
 
 
 if __name__ == "__main__":
+	profile = False
 	for a in sys.argv[1:]:
 		if a.startswith("-"):
-			print "**Ignoring unknown option '%s'" % a
+			if a[1:] == "profile":
+				profile = True
+			else:
+				print "**Ignoring unknown option '%s'" % a
 		else:
 			try:
 				inf = open(a, "rb")
@@ -176,7 +181,13 @@ if __name__ == "__main__":
 				continue
 			print "Loaded %u bytes from '%s'" % (len(data), a)
 			t0 = time.clock()
+			if profile:
+				pr = cProfile.Profile()
+				pr.enable()
 			compr = compress(data)
+			if profile:
+				pr.disable()
+				pr.print_stats()
 			elapsed = time.clock() - t0
 			rate = len(data) / (1024 * 1024 * elapsed)
 			print " Compressed to %u bytes, %.2f%% in %s s [%.1f MB/s]" % (len(compr), 100.0 * len(compr) / len(data), elapsed, rate)
