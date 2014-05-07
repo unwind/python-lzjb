@@ -37,7 +37,7 @@ MATCH_BITS = 6
 MATCH_MIN = 3
 MATCH_MAX = ((1 << MATCH_BITS) + (MATCH_MIN - 1))
 OFFSET_MASK = ((1 << (16 - MATCH_BITS)) - 1)
-LEMPEL_SIZE_BASE = 1024
+LEMPEL_SIZE = 1024
 
 
 def compress(s, with_size = True):
@@ -50,8 +50,6 @@ def compress(s, with_size = True):
 	If with_size is not false, the length of the input is prepended to the result,
 	in a special variable-length binary encoding.
 	"""
-
-	LEMPEL_SIZE = LEMPEL_SIZE_BASE
 
 	# Make sure the input is a byte array. If it's not, convert.
 	if not isinstance(s, bytearray):
