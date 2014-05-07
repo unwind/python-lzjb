@@ -57,7 +57,6 @@ def compress(s, with_size = True):
 	if not isinstance(s, bytearray):
 		s = bytearray(s)
 
-	# During compression, treat output string as list of code points.
 	dst = bytearray()
 
 	# Encode input size. This uses a variable-length encoding.
