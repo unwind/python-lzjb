@@ -42,8 +42,12 @@ LEMPEL_SIZE_BASE = 1024
 
 def compress(s, with_size = True):
 	"""
-	Compresses the source string, returning a string holding the compressed data.
-	If with_size is not false, the length of the input string is prepended to the result,
+	Compresses the source bytearray, returning a new bytearray holding the compressed data.
+
+	If the input is not a bytearray, an attempt to convert it by passing it to the bytearray()
+	constructor is made. This will of course fail for objects that bytearray() doesn't accept.
+
+	If with_size is not false, the length of the input is prepended to the result,
 	in a special variable-length binary encoding.
 	"""
 
@@ -102,22 +106,21 @@ def compress(s, with_size = True):
 		else:
 			dst.append(s[src])
 			src += 1
-	# Now implode the list of codepoints into an actual string.
-	return str(dst)
+	return dst
 
 
 def decompressed_size(s):
 	"""
-	Returns a tuple (original length, length of size) from a string of compressed data.
+	Returns a tuple (original length, length of size) from a bytearray of compressed data.
 
-	The original length is the length of the string passed to compress(), and length of
+	The original length is the length of the data passed to compress(), and length of
 	size is the number of bytes that are used in s to express this size.
 	"""
 	dstSize = 0
 	src = 0
 	# Extract prefixed encoded size, if present.
 	while True:
-		c = ord(s[src])
+		c = s[src]
 		src += 1
 		if (c & 0x80):
 			dstSize |= c & 0x7f
@@ -129,7 +132,10 @@ def decompressed_size(s):
 
 def decompress(s, with_size = True):
 	"""
-	Decompresses a string of compressed data, returning the original string.
+	Decompresses a bytearray of compressed data, returning the original array.
+
+	The return value is always a bytearray, the Python type of the input to
+	compress() is not encoded.
 
 	The value of with_size must match the value given when s was generated
 	by compress().
@@ -142,27 +148,27 @@ def decompress(s, with_size = True):
 		if dstSize < 0:
 			return None
 
-	dst = ""
+	dst = bytearray()
 	copymask = 1 << (NBBY - 1)
 	while src < len(s):
 		copymask <<= 1
 		if copymask == (1 << NBBY):
 			copymask = 1
-			copymap = ord(s[src])
+			copymap = s[src]
 			src += 1
 		if copymap & copymask:
-			mlen = (ord(s[src]) >> (NBBY - MATCH_BITS)) + MATCH_MIN
-			offset = ((ord(s[src]) << NBBY) | ord(s[src + 1])) & OFFSET_MASK
+			mlen = (s[src] >> (NBBY - MATCH_BITS)) + MATCH_MIN
+			offset = ((s[src] << NBBY) | s[src + 1]) & OFFSET_MASK
 			src += 2
 			cpy = len(dst) - offset
 			if cpy < 0:
 				return None
 			while mlen > 0:
-				dst += dst[cpy]
+				dst.append(dst[cpy])
 				cpy += 1
 				mlen -= 1
 		else:
-			dst += s[src]
+			dst.append(s[src])
 			src += 1
 	return dst
 

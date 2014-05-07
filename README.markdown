@@ -1,5 +1,5 @@
-lzjb
-====
+pylzjb: lzjb in pure Python
+======================
 This is a port of [Jeff Bonwick's](http://en.wikipedia.org/wiki/Jeff_Bonwick) [lzjb compression algorithm](http://en.wikipedia.org/wiki/LZJB) to pure Python.
 This compression scheme is used in the ZFS filesystem.
 
@@ -23,7 +23,7 @@ There is a lot of work to be done to bring this into anything near "production q
 - Proper Python packaging (setup.py, and so on).
 - Test framework (including two-way testing against the C code).
 - More profiling and optimization.
-
+- An idea about Python 2.x/3.x compatibility and targeting; currently written against 2.7.6.
 
 Performance
 -----------
@@ -34,12 +34,12 @@ On my not-so-hot laptop (Intel® Core™ i5 M 480 @ 2.67GHz) it currently achiev
 API
 ===
 The package's API is extremely simple.
-Data is managed as ordinary Python strings, which are simply treated as being binary.
+Data is managed as Python [`bytearray`](https://docs.python.org/2.7/library/functions.html#bytearray).
 
-To compress a string, call `lzjb.compress()`.
-This returns a string of compressed data.
+To compress a bytearray, call `lzjb.compress()`.
+This returns a new bytearray holding the compressed data.
 
-There are two things you can do with a string of already-compressed data:
+There are two things you can do with a bytearray of compressed data:
 
 1. Decompress it, using `lzjb.decompress()`.
 2. Find out about its decompressed size, and the header length, using `lzjb.decompressed_size()`.
