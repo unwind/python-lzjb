@@ -1,10 +1,16 @@
-pylzjb: lzjb in pure Python
-======================
+python-lzjb: lzjb in pure Python
+================================
 This is a port of [Jeff Bonwick's](http://en.wikipedia.org/wiki/Jeff_Bonwick) [lzjb compression algorithm](http://en.wikipedia.org/wiki/LZJB) to pure Python.
 This compression scheme is used in the ZFS filesystem.
 
 One of its main features is very small memory requirements for decompression.
 This can make it a suitable choice when adding compression in memory-constrained environments, such as in embedded development.
+
+The name is perhaps not optimal.
+I didn't want to come up with a "fancy" name that has no meaning.
+I know of the [pylzjb](https://code.google.com/p/pylzjb/) project, which provides Python bindings for a C implementation of lzjb.
+
+Unlike pylzjb, the module install name for this project is simply `lzjb`, which I think makes sense (it's kind of obvious that the imported module is for Python).
 
 
 Original Code
