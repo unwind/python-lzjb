@@ -4,7 +4,7 @@
 
 from distutils.core import setup
 setup(name = 'lzjb',
-	version = '1.0',
+	version = '0.1',
 	description = "A pure Python implementation of LZJB compression/decompression",
 	author = "Emil Brink",
 	author_email = "emil@obsession.se",
@@ -15,4 +15,4 @@ setup(name = 'lzjb',
 	classifiers = [
 	"License :: OSI Approved :: BSD License",
 	],
-	)
+)
