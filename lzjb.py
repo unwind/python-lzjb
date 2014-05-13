@@ -27,10 +27,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import cProfile
 import math
-import sys
-import time
 
 NBBY = 8
 MATCH_BITS = 6
@@ -68,7 +65,6 @@ def compress(s, with_size = True):
 				if size == 0:
 					break
 			dst[-1] |= 0x80
-			print([hex(x) for x in dst])
 
 	lempel = [0] * LEMPEL_SIZE
 	copymask = 1 << (NBBY - 1)
@@ -171,11 +167,50 @@ def decompress(s, with_size = True):
 
 
 if __name__ == "__main__":
+	import cProfile
+	import os
+	import sys
+	import time
+
+	def loop(data):
+		t0 = time.clock()
+		if profile:
+			pr = cProfile.Profile()
+			pr.enable()
+		compr = compress(data)
+		if profile:
+			pr.disable()
+			pr.print_stats()
+		elapsed = time.clock() - t0
+		rate = len(data) / (1024 * 1024 * elapsed)
+		print " Compressed to %u bytes, %.2f%% in %s s [%.2f MB/s]" % (len(compr), 100.0 * len(compr) / len(data), elapsed, rate)
+		decompr = decompress(compr)
+		if decompr != data:
+			print "**Decompression failed!"
+
+	def save(filename, data):
+		EXTENSION = ".lzjb"
+		if filename.endswith(EXTENSION):
+			outname = filename[:-len(EXTENSION)]
+		else:
+			outname = os.path.basename(filename) + EXTENSION
+		out = open(outname, "wb")
+		out.write(data)
+		out.close()
+
+	DECOMPRESS = 0
+	COMPRESS = 1
+	mode = None
+
 	profile = False
 	for a in sys.argv[1:]:
 		if a.startswith("-"):
 			if a[1:] == "profile":
 				profile = True
+			elif a[1:] == "c":
+				mode = COMPRESS
+			elif a[1:] == "x":
+				mode = DECOMPRESS
 			else:
 				print "**Ignoring unknown option '%s'" % a
 		else:
@@ -183,21 +218,14 @@ if __name__ == "__main__":
 				inf = open(a, "rb")
 				data = inf.read()
 				inf.close()
+				data = bytearray(data)
 			except:
 				print "**Failed to open '%s'" % a
 				continue
 			print "Loaded %u bytes from '%s'" % (len(data), a)
-			t0 = time.clock()
-			if profile:
-				pr = cProfile.Profile()
-				pr.enable()
-			compr = compress(data)
-			if profile:
-				pr.disable()
-				pr.print_stats()
-			elapsed = time.clock() - t0
-			rate = len(data) / (1024 * 1024 * elapsed)
-			print " Compressed to %u bytes, %.2f%% in %s s [%.2f MB/s]" % (len(compr), 100.0 * len(compr) / len(data), elapsed, rate)
-			decompr = decompress(compr)
-			if decompr != data:
-				print "**Decompression failed!"
+			if mode == COMPRESS:
+				save(a, compress(data))
+			elif mode == DECOMPRESS:
+				save(a, decompress(data))
+			else:
+				loop(data)
