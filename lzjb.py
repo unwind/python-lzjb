@@ -41,16 +41,9 @@ def compress(s, with_size = True):
 	"""
 	Compresses the source bytearray, returning a new bytearray holding the compressed data.
 
-	If the input is not a bytearray, an attempt to convert it by passing it to the bytearray()
-	constructor is made. This will of course fail for objects that bytearray() doesn't accept.
-
 	If with_size is not false, the length of the input is prepended to the result,
 	in a special variable-length binary encoding.
 	"""
-
-	# Make sure the input is a byte array. If it's not, convert.
-	if not isinstance(s, bytearray):
-		s = bytearray(s)
 
 	dst = bytearray()
 
