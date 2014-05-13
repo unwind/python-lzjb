@@ -61,16 +61,14 @@ def compress(s, with_size = True):
 	if with_size:
 		size = len(s)
 		if size:
-			sbytes = []
 			size += 1
 			while True:
-				sbytes.append(size & 0x7f)
+				dst.append(size & 0x7f)
 				size = int(math.floor(size / 128))
 				if size == 0:
 					break
-			sbytes[0] |= 0x80
-			for sb in reversed(sbytes):
-				dst.append(sb)
+			dst[-1] |= 0x80
+			print([hex(x) for x in dst])
 
 	lempel = [0] * LEMPEL_SIZE
 	copymask = 1 << (NBBY - 1)
@@ -116,13 +114,15 @@ def decompressed_size(s):
 	dstSize = 0
 	src = 0
 	# Extract prefixed encoded size, if present.
+	val = 1
 	while True:
 		c = s[src]
 		src += 1
-		if (c & 0x80):
-			dstSize |= c & 0x7f
+		if c & 0x80:
+			dstSize |= val * (c & 0x7f)
 			break
-		dstSize = (dstSize | c) << 7
+		dstSize += val * c
+		val <<= 7
 	dstSize -= 1	# -1 means "not known".
 	return (dstSize, src)
 
