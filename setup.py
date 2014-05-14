@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #
+# Setup script for python-lzjb.
 #
 
 from distutils.core import setup
