@@ -182,11 +182,6 @@ if __name__ == "__main__":
 			print "**Decompression failed!"
 
 	def save(filename, data):
-		EXTENSION = ".lzjb"
-		if filename.endswith(EXTENSION):
-			outname = filename[:-len(EXTENSION)]
-		else:
-			outname = os.path.basename(filename) + EXTENSION
 		out = open(outname, "wb")
 		out.write(data)
 		out.close()
@@ -194,16 +189,23 @@ if __name__ == "__main__":
 	DECOMPRESS = 0
 	COMPRESS = 1
 	mode = None
+	outname = None
 
 	profile = False
 	for a in sys.argv[1:]:
 		if a.startswith("-"):
 			if a[1:] == "profile":
 				profile = True
+			elif a[1:2] == "o":
+				outname = a[2:]
 			elif a[1:] == "c":
 				mode = COMPRESS
+				if outname is None:
+					print("**Use -oNAME to set output name, before -c")
 			elif a[1:] == "x":
 				mode = DECOMPRESS
+				if outname is None:
+					print("**Use -oNAME to set output name, before -x")
 			else:
 				print "**Ignoring unknown option '%s'" % a
 		else:
@@ -217,8 +219,8 @@ if __name__ == "__main__":
 				continue
 			print "Loaded %u bytes from '%s'" % (len(data), a)
 			if mode == COMPRESS:
-				save(a, compress(data))
+				save(outname, compress(data))
 			elif mode == DECOMPRESS:
-				save(a, decompress(data, False))
+				save(outname, decompress(data, False))
 			else:
 				loop(data)

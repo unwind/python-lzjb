@@ -50,30 +50,12 @@ static void * load_file(const char *filename, size_t *length)
 	return buf;
 }
 
-/* Saves the given buffer. Analyzes the filename, and removes the extension
- * if found, or adds it if it isn't. Basically smarter than me.
- *
- * All filenames are made fully relative, any path components are stripped out.
-*/
+/* Saves the given buffer. */
 static bool save_file(const char *filename, const void *data, size_t length)
 {
-	const char *rslash = strrchr(filename, '/');
-	const char *ext = strstr(filename, EXTENSION);
-	char out_name[1024];
 	bool wrote = false;
 
-	if(rslash != NULL)
-		filename = rslash + 1;
-
-	if(ext != NULL)
-	{
-		memcpy(out_name, filename, ext - filename);
-		out_name[ext - filename] = '\0';
-	}
-	else
-		snprintf(out_name, sizeof out_name, "%s" EXTENSION, filename);
-
-	FILE *out = fopen(out_name, "wb");
+	FILE *out = fopen(filename, "wb");
 	if(out != NULL)
 	{
 		wrote = fwrite(data, length, 1, out) == 1;
@@ -120,7 +102,7 @@ static const void * size_get(const void *buffer, size_t *size)
 	return get;
 }
 
-static void compress(const char *filename)
+static void compress(const char *filename, const char *outname)
 {
 	size_t in_size;
 	void *in = load_file(filename, &in_size);
@@ -132,14 +114,14 @@ static void compress(const char *filename)
 		void *put = out;
 		const size_t out_left = out_max - ((unsigned char *) put - (unsigned char *) out);
 		const size_t out_size = lzjb_compress(in, put, in_size, out_left, 0);
-		if(save_file(filename, out, out_size))
+		if(save_file(outname, out, out_size))
 			printf("%-20s %zu -> %zu [%.1f%%]\n", filename, in_size, out_size, 100.f * out_size / in_size);
 		free(out);
 		free(in);
 	}
 }
 
-static void decompress(const char *filename)
+static void decompress(const char *filename, const char *outname)
 {
 	size_t in_size;
 	void *in = load_file(filename, &in_size);
@@ -149,7 +131,7 @@ static void decompress(const char *filename)
 		void *get = (void *) size_get(in, &out_size);
 		void *out = malloc(out_size);
 		lzjb_decompress(get, out, in_size, out_size, 0);
-		if(save_file(filename, out, out_size))
+		if(save_file(outname, out, out_size))
 			printf("%-20s %zu -> %zu [%.1f%%]\n", filename, in_size, out_size, 100.f * in_size / out_size);
 		free(out);
 		free(in);
@@ -162,8 +144,11 @@ int main(int argc, char *argv[])
 
 	for(int i = 1; argv[i] != NULL; ++i)
 	{
+		const char *outname = NULL;
 		if(argv[i][0] == '-')
 		{
+			if(argv[i][1] == 'o')
+				outname = argv[i] + 2;
 			if(argv[i][1] == 'c')
 				mode = COMPRESS;
 			else if(argv[i][1] == 'x')
@@ -175,9 +160,9 @@ int main(int argc, char *argv[])
 			}
 		}
 		else if(mode == COMPRESS)
-			compress(argv[i]);
+			compress(argv[i], outname);
 		else if(mode == DECOMPRESS)
-			decompress(argv[i]);
+			decompress(argv[i], outname);
 	}
 	return EXIT_SUCCESS;
 }
