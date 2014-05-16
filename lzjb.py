@@ -50,14 +50,11 @@ def compress(s, with_size = True):
 	# Encode input size. This uses a variable-length encoding.
 	if with_size:
 		size = len(s)
-		if size:
-			size += 1
-			while True:
-				dst.append(size & 0x7f)
-				size = int(math.floor(size / 128))
-				if size == 0:
-					break
-			dst[-1] |= 0x80
+		size += 1
+		while size > 0:
+			dst.append(size & 0x7f)
+			size = int(math.floor(size / 128))
+		dst[-1] |= 0x80
 
 	lempel = [0] * LEMPEL_SIZE
 	copymask = 1 << (NBBY - 1)
