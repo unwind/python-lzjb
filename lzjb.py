@@ -27,8 +27,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import math
-
 NBBY = 8
 MATCH_BITS = 6
 MATCH_MIN = 3
@@ -53,7 +51,7 @@ def compress(s, with_size = True):
 		size += 1
 		while size > 0:
 			dst.append(size & 0x7f)
-			size = int(math.floor(size / 128))
+			size >>= 7
 		dst[-1] |= 0x80
 
 	lempel = [0] * LEMPEL_SIZE
