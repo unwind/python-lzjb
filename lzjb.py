@@ -108,7 +108,7 @@ def decompressed_size(s):
 		c = s[src]
 		src += 1
 		if c & 0x80:
-			dstSize |= val * (c & 0x7f)
+			dstSize += val * (c & 0x7f)
 			break
 		dstSize += val * c
 		val <<= 7
