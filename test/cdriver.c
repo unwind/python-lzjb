@@ -128,7 +128,8 @@ static void compress(const char *filename)
 	{
 		const size_t out_max = in_size + 128;
 		void *out = malloc(out_max);
-		void *put = size_put(out, in_size);
+//		void *put = size_put(out, in_size);
+		void *put = out;
 		const size_t out_left = out_max - ((unsigned char *) put - (unsigned char *) out);
 		const size_t out_size = lzjb_compress(in, put, in_size, out_left, 0);
 		if(save_file(filename, out, out_size))
