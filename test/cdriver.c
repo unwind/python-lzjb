@@ -68,7 +68,6 @@ static bool save_file(const char *filename, const void *data, size_t length)
 static void * size_put(void *buffer, size_t length)
 {
 	uint8_t *put = buffer;
-	length += 1;
 	do
 	{
 		*put++ = length & 0x7f;
@@ -110,8 +109,7 @@ static void compress(const char *filename, const char *outname)
 	{
 		const size_t out_max = in_size + 128;
 		void *out = malloc(out_max);
-//		void *put = size_put(out, in_size);
-		void *put = out;
+		void *put = size_put(out, in_size);
 		const size_t out_left = out_max - ((unsigned char *) put - (unsigned char *) out);
 		const size_t out_size = lzjb_compress(in, put, in_size, out_left, 0);
 		if(save_file(outname, out, out_size))
@@ -130,10 +128,13 @@ static void decompress(const char *filename, const char *outname)
 		size_t out_size;
 		void *get = (void *) size_get(in, &out_size);
 		void *out = malloc(out_size);
-		lzjb_decompress(get, out, in_size, out_size, 0);
-		if(save_file(outname, out, out_size))
-			printf("%-20s %zu -> %zu [%.1f%%]\n", filename, in_size, out_size, 100.f * in_size / out_size);
-		free(out);
+		if(out != NULL)
+		{
+			lzjb_decompress(get, out, in_size, out_size, 0);
+			if(save_file(outname, out, out_size))
+				printf("%-20s %zu -> %zu [%.1f%%]\n", filename, in_size, out_size, 100.f * in_size / out_size);
+			free(out);
+		}
 		free(in);
 	}
 }
@@ -141,15 +142,18 @@ static void decompress(const char *filename, const char *outname)
 int main(int argc, char *argv[])
 {
 	enum { DECOMPRESS, COMPRESS } mode = COMPRESS;
+	const char *outname = NULL;
 
 	for(int i = 1; argv[i] != NULL; ++i)
 	{
-		const char *outname = NULL;
 		if(argv[i][0] == '-')
 		{
 			if(argv[i][1] == 'o')
+			{
 				outname = argv[i] + 2;
-			if(argv[i][1] == 'c')
+				printf("cdriver: set outname to '%s'\n", outname);
+			}
+			else if(argv[i][1] == 'c')
 				mode = COMPRESS;
 			else if(argv[i][1] == 'x')
 				mode = DECOMPRESS;

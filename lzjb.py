@@ -35,7 +35,7 @@ OFFSET_MASK = (1 << (16 - MATCH_BITS)) - 1
 LEMPEL_SIZE = 1024
 
 
-def compress(s, with_size = True):
+def compress(s, with_size = False):
 	"""
 	Compresses the source bytearray, returning a new bytearray holding the compressed data.
 
@@ -48,7 +48,6 @@ def compress(s, with_size = True):
 	# Encode input size. This uses a variable-length encoding.
 	if with_size:
 		size = len(s)
-		size += 1
 		while size > 0:
 			dst.append(size & 0x7f)
 			size >>= 7
@@ -107,11 +106,10 @@ def decompressed_size(s):
 			break
 		dstSize += val * c
 		val <<= 7
-	dstSize -= 1	# -1 means "not known".
 	return (dstSize, src)
 
 
-def decompress(s, with_size = True):
+def decompress(s, with_size = False):
 	"""
 	Decompresses a bytearray of compressed data, returning the original array.
 
@@ -219,8 +217,8 @@ if __name__ == "__main__":
 				continue
 			print "Loaded %u bytes from '%s'" % (len(data), a)
 			if mode == COMPRESS:
-				save(outname, compress(data))
+				save(outname, compress(data, True))
 			elif mode == DECOMPRESS:
-				save(outname, decompress(data, False))
+				save(outname, decompress(data, True))
 			else:
 				loop(data)

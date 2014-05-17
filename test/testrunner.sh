@@ -3,16 +3,32 @@
 #
 # Usage:
 #
-# test-lzjb.sh COMPRESSOR(1) TAG(2) SOURCE_DIRECTORY(3)
+# testrunner.sh COMPRESSOR DECOMPRESSOR FILENAME1 ...
 #
-# Creates a directory named TAG, then runs COMPRESSOR on the 10
-# largest files in SOURCE_DIRECTORY, saving output in TAG.
+# Compresses and decompresses each FILENAME using the indicated tools.
 #
-# COMPRESSOR is assumed to be a relative path, and to accept -c and -x
-# options to compress/decompress, respectively.
+# Tool names are assumed to use relative path, and to accept the
+# -o, -c and -x options to set output and to compress/decompress.
 
-mkdir -p $2
-for a in $(ls -S $3 | head)
+TMPDIR=/tmp
+
+COMPRESSOR=$1
+shift
+DECOMPRESSOR=$1
+shift
+
+for f in $*
 do
-	cd $2 && ../$1 -c $3/$a && cd ..
+	BASE=$(basename $f)
+	echo "Compressing ${BASE} ..."
+	TMPF=${TMPDIR}/${BASE}
+	$COMPRESSOR   -o${TMPF}.lzjb -c $f
+	echo "Decompressing ..."
+	$DECOMPRESSOR -o${TMPF}.orig -x ${TMPF}.lzjb
+	if cmp $f ${TMPF}.orig; then
+		echo "${f}: SUCCESS"
+		rm -f ${TMPF}.{lzjb,orig}
+	else
+		echo "${f}: FAILED"
+	fi
 done
