@@ -15,9 +15,11 @@ CFLAGS	= -std=c99 -Wall -pedantic
 
 # ---------------------------------------------------------------------
 
-test-bin:	cdriver test-bin.sh
-	./test-bin.sh
+test-bin:	cdriver testrunner.sh testfile.sh
+	testrunner /usr/bin
 
+test-etc:	cdriver testrunner.sh testfile.sh
+	testrunner.sh /etc
 
 cdriver:	cdriver.c lzjb.c
 	$(CC) $(CFLAGS) -o $@ $< 

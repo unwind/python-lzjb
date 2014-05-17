@@ -1,34 +1,11 @@
 #
-# Test script for python-lzjb.
+# testrunner.sh - Runs testfile.sh on a bunch of files.
 #
-# Usage:
-#
-# testrunner.sh COMPRESSOR DECOMPRESSOR FILENAME1 ...
-#
-# Compresses and decompresses each FILENAME using the indicated tools.
-#
-# Tool names are assumed to use relative path, and to accept the
-# -o, -c and -x options to set output and to compress/decompress.
 
-TMPDIR=/tmp
+DIR=$1
+PYDRIVER=../lzjb.py
+CDRIVER=./cdriver
 
-COMPRESSOR=$1
-shift
-DECOMPRESSOR=$1
-shift
-
-for f in $*
-do
-	BASE=$(basename $f)
-	echo "Compressing ${BASE} ..."
-	TMPF=${TMPDIR}/${BASE}
-	$COMPRESSOR   -o${TMPF}.lzjb -c $f
-	echo "Decompressing ..."
-	$DECOMPRESSOR -o${TMPF}.orig -x ${TMPF}.lzjb
-	if cmp $f ${TMPF}.orig; then
-		echo "${f}: SUCCESS"
-		rm -f ${TMPF}.{lzjb,orig}
-	else
-		echo "${f}: FAILED"
-	fi
+for f in $(ls -S1 $DIR | head); do
+	./testfile.sh $PYDRIVER $PYDRIVER $DIR/$f
 done
