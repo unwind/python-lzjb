@@ -123,9 +123,12 @@ def decompress(s, with_size = False):
 	src = 0
 	dstSize = 0
 	if with_size:
-		dstSize, src = decompressed_size(s)
+		dstSize, dlen = decompressed_size(s)
 		if dstSize < 0:
 			return None
+		print("Extracted size %u, encoded in %u bytes" % (dstSize, dlen))
+		s = s[dlen:]
+		print("Starting decompress, new size is %u" % len(s))
 
 	dst = bytearray()
 	copymask = 1 << (NBBY - 1)
@@ -133,9 +136,9 @@ def decompress(s, with_size = False):
 		copymask <<= 1
 		if copymask == (1 << NBBY):
 			copymask = 1
-#			print("reading copymap at %u" % src)
+			print("reading copymap at %u" % src)
 			copymap = s[src]
-#			print(" got 0x%02x" % copymap)
+			print(" got 0x%02x" % copymap)
 			src += 1
 		if copymap & copymask:
 			mlen = (s[src] >> (NBBY - MATCH_BITS)) + MATCH_MIN
@@ -144,16 +147,16 @@ def decompress(s, with_size = False):
 			cpy = len(dst) - offset
 			if cpy < 0:
 				return None
-#			print("have %u, copying %u from %u (src=%u)" % (len(dst), mlen, cpy, src))
+			print("src=%lu: %u from cpy=%lu to dst=%lu" % (src, mlen, cpy, len(dst)));
 			while mlen > 0:
 				dst.append(dst[cpy])
 				cpy += 1
 				mlen -= 1
 		else:
-#			print("copying byte at %u to %u" % (src, len(dst)))
+			print("src=%lu: 1 to dst=%lu" % (src, len(dst)));
 			dst.append(s[src])
 			src += 1
-#	print("decompressed %u, header said %u, src=%u, input %u" % (len(dst), dstSize, src, len(s)))
+	print("decompressed %u, header said %u, src=%u, input %u" % (len(dst), dstSize, src, len(s)))
 	return dst
 
 

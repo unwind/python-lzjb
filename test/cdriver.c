@@ -149,10 +149,7 @@ int main(int argc, char *argv[])
 		if(argv[i][0] == '-')
 		{
 			if(argv[i][1] == 'o')
-			{
 				outname = argv[i] + 2;
-				printf("cdriver: set outname to '%s'\n", outname);
-			}
 			else if(argv[i][1] == 'c')
 				mode = COMPRESS;
 			else if(argv[i][1] == 'x')
