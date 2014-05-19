@@ -51,6 +51,29 @@ def encode_size(size, dst = None):
 	return dst
 
 
+def decode_size(s):
+	"""
+	Decodes a size (encoded with encode_size()) from the start of s.
+
+	Returns a tuple (size, len) where size is the size that was decoded,
+	and len is the number of bytes from s that were consumed.
+	"""
+	dstSize = 0
+	src = 0
+	# Extract prefixed encoded size, if present.
+	val = 1
+	while True:
+		c = s[src]
+		src += 1
+		if c & 0x80:
+			dstSize += val * (c & 0x7f)
+			break
+		dstSize += val * c
+		val <<= 7
+	print("read %u bytes of size: %u" % (src, dstSize))
+	return (dstSize, src)
+
+
 def compress(s, dst = None):
 	"""
 	Compresses s, the source bytearray.
@@ -97,28 +120,6 @@ def compress(s, dst = None):
 	return dst
 
 
-def decode_size(s):
-	"""
-	Decodes a size (encoded with encode_size()) from the start of s.
-
-	Returns a tuple (size, len) where size is the size that was decoded,
-	and len is the number of bytes from s that were consumed.
-	"""
-	dstSize = 0
-	src = 0
-	# Extract prefixed encoded size, if present.
-	val = 1
-	while True:
-		c = s[src]
-		src += 1
-		if c & 0x80:
-			dstSize += val * (c & 0x7f)
-			break
-		dstSize += val * c
-		val <<= 7
-	return (dstSize, src)
-
-
 def decompress(s, dst = None):
 	"""
 	Decompresses a bytearray of compressed data.
@@ -129,6 +130,8 @@ def decompress(s, dst = None):
 	The output bytearray is returned.
 	"""
 
+	print("decompressing %u bytes: '%s'" % (len(s), s))
+
 	src = 0
 	if dst is None: dst = bytearray()
 	copymask = 1 << (NBBY - 1)
@@ -136,9 +139,9 @@ def decompress(s, dst = None):
 		copymask <<= 1
 		if copymask == (1 << NBBY):
 			copymask = 1
-			print("reading copymap at %u" % src)
+#			print("reading copymap at %u" % src)
 			copymap = s[src]
-			print(" got 0x%02x" % copymap)
+#			print(" got 0x%02x" % copymap)
 			src += 1
 		if copymap & copymask:
 			mlen = (s[src] >> (NBBY - MATCH_BITS)) + MATCH_MIN
@@ -146,17 +149,18 @@ def decompress(s, dst = None):
 			src += 2
 			cpy = len(dst) - offset
 			if cpy < 0:
+				print("got offset=%d at %u -> cpy=%d which is hard" % (offset, len(dst), cpy))
 				return None
-			print("src=%lu: %u from cpy=%lu to dst=%lu" % (src, mlen, cpy, len(dst)));
+#			print("src=%lu: %u from cpy=%lu to dst=%lu" % (src, mlen, cpy, len(dst)));
 			while mlen > 0:
 				dst.append(dst[cpy])
 				cpy += 1
 				mlen -= 1
 		else:
-			print("src=%lu: 1 to dst=%lu" % (src, len(dst)));
+#			print("src=%lu: 1 to dst=%lu" % (src, len(dst)));
 			dst.append(s[src])
 			src += 1
-	print("decompressed %u, header said %u, src=%u, input %u" % (len(dst), dstSize, src, len(s)))
+	print("decompressed %u, src=%u, input %u" % (len(dst), src, len(s)))
 	return dst
 
 
