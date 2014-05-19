@@ -107,14 +107,18 @@ static void compress(const char *filename, const char *outname)
 	void *in = load_file(filename, &in_size);
 	if(in != NULL)
 	{
-		const size_t out_max = in_size + 128;
+		const size_t out_max = in_size + 8;
 		void *out = malloc(out_max);
-		void *put = size_put(out, in_size);
-		const size_t out_left = out_max - ((unsigned char *) put - (unsigned char *) out);
-		const size_t out_size = lzjb_compress(in, put, in_size, out_left, 0);
-		if(save_file(outname, out, out_size))
-			printf("%-20s %zu -> %zu [%.1f%%]\n", filename, in_size, out_size, 100.f * out_size / in_size);
-		free(out);
+		if(out != NULL)
+		{
+			void *put = size_put(out, in_size);
+			size_t out_size = (uchar_t * ) put - (uchar_t *) out;
+			const size_t out_left = out_max - ((unsigned char *) put - (unsigned char *) out);
+			out_size += lzjb_compress(in, put, in_size, out_left, 0);
+			if(save_file(outname, out, out_size))
+				printf("%-20s %zu -> %zu [%.1f%%]\n", filename, in_size, out_size, 100.f * out_size / in_size);
+			free(out);
+		}
 		free(in);
 	}
 }
