@@ -107,7 +107,7 @@ def compress(s, dst = None):
 		cpy = src - offset
 		if cpy >= 0 and cpy != src and s[src:src + 3] == s[cpy:cpy + 3]:
 			dst[copymap] |= copymask
-			for mlen in xrange(MATCH_MIN, MATCH_MAX):
+			for mlen in range(MATCH_MIN, MATCH_MAX):
 				if s[src + mlen] != s[cpy + mlen]:
 					break
 			dst.append(((mlen - MATCH_MIN) << (NBBY - MATCH_BITS)) | (offset >> NBBY))
@@ -178,10 +178,10 @@ if __name__ == "__main__":
 			pr.print_stats()
 		elapsed = time.clock() - t0
 		rate = len(data) / (1024 * 1024 * elapsed)
-		print " Compressed to %u bytes, %.2f%% in %s s [%.2f MB/s]" % (len(compr), 100.0 * len(compr) / len(data), elapsed, rate)
+		print(" Compressed to %u bytes, %.2f%% in %s s [%.2f MB/s]" % (len(compr), 100.0 * len(compr) / len(data), elapsed, rate))
 		decompr = decompress(compr)
 		if decompr != data:
-			print "**Decompression failed!"
+			print("**Decompression failed!")
 
 	def save(filename, data):
 		out = open(outname, "wb")
@@ -209,7 +209,7 @@ if __name__ == "__main__":
 				if outname is None:
 					print("**Use -oNAME to set output name, before -x")
 			else:
-				print "**Ignoring unknown option '%s'" % a
+				print("**Ignoring unknown option '%s'" % a)
 		else:
 			try:
 				inf = open(a, "rb")
@@ -217,9 +217,9 @@ if __name__ == "__main__":
 				inf.close()
 				data = bytearray(data)
 			except:
-				print "**Failed to open '%s'" % a
+				print("**Failed to open '%s'" % a)
 				continue
-			print "Loaded %u bytes from '%s'" % (len(data), a)
+			print("Loaded %u bytes from '%s'" % (len(data), a))
 			if mode == COMPRESS:
 				dst = encode_size(len(data))
 				save(outname, compress(data, dst))
