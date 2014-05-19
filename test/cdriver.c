@@ -107,7 +107,7 @@ static void compress(const char *filename, const char *outname)
 	void *in = load_file(filename, &in_size);
 	if(in != NULL)
 	{
-		const size_t out_max = in_size + 8;
+		const size_t out_max = in_size + 128;
 		void *out = malloc(out_max);
 		if(out != NULL)
 		{
