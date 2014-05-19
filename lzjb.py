@@ -70,7 +70,6 @@ def decode_size(s):
 			break
 		dstSize += val * c
 		val <<= 7
-	print("read %u bytes of size: %u" % (src, dstSize))
 	return (dstSize, src)
 
 
@@ -130,8 +129,6 @@ def decompress(s, dst = None):
 	The output bytearray is returned.
 	"""
 
-	print("decompressing %u bytes: '%s'" % (len(s), s))
-
 	src = 0
 	if dst is None: dst = bytearray()
 	copymask = 1 << (NBBY - 1)
@@ -160,7 +157,7 @@ def decompress(s, dst = None):
 #			print("src=%lu: 1 to dst=%lu" % (src, len(dst)));
 			dst.append(s[src])
 			src += 1
-	print("decompressed %u, src=%u, input %u" % (len(dst), src, len(s)))
+#	print("decompressed %u, src=%u, input %u" % (len(dst), src, len(s)))
 	return dst
 
 
