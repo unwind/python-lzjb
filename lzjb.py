@@ -35,23 +35,33 @@ OFFSET_MASK = (1 << (16 - MATCH_BITS)) - 1
 LEMPEL_SIZE = 1024
 
 
-def compress(s, with_size = False):
+def encode_size(size, dst = None):
 	"""
-	Compresses the source bytearray, returning a new bytearray holding the compressed data.
+	Encodes the given size in little-endian variable-length encoding.
 
-	If with_size is not false, the length of the input is prepended to the result,
-	in a special variable-length binary encoding.
+	The dst argument can be an existing bytearray to append the size.
+	"""
+	if not dst: dst = bytearray()
+	done = False
+	while not done:
+		dst.append(size & 0x7f)
+		size >>= 7
+		done = size == 0
+	dst[-1] |= 0x80
+	return dst
+
+
+def compress(s, dst = None):
+	"""
+	Compresses s, the source bytearray.
+
+	If dst is not None, it's assumed to be the output bytearray and bytes are appended to it.
+	If it is None, a new bytearray is created.
+
+	The destination bytearray is returned.
 	"""
 
-	dst = bytearray()
-
-	# Encode input size. This uses a variable-length encoding.
-	if with_size:
-		size = len(s)
-		while size > 0:
-			dst.append(size & 0x7f)
-			size >>= 7
-		dst[-1] |= 0x80
+	if dst is None: dst = bytearray()
 
 	lempel = [0] * LEMPEL_SIZE
 	copymask = 1 << (NBBY - 1)
@@ -87,12 +97,12 @@ def compress(s, with_size = False):
 	return dst
 
 
-def decompressed_size(s):
+def decode_size(s):
 	"""
-	Returns a tuple (original length, length of size) from a bytearray of compressed data.
+	Decodes a size (encoded with encode_size()) from the start of s.
 
-	The original length is the length of the data passed to compress(), and length of
-	size is the number of bytes that are used in s to express this size.
+	Returns a tuple (size, len) where size is the size that was decoded,
+	and len is the number of bytes from s that were consumed.
 	"""
 	dstSize = 0
 	src = 0
@@ -109,28 +119,18 @@ def decompressed_size(s):
 	return (dstSize, src)
 
 
-def decompress(s, with_size = False):
+def decompress(s, dst = None):
 	"""
-	Decompresses a bytearray of compressed data, returning the original array.
+	Decompresses a bytearray of compressed data.
 
-	The return value is always a bytearray, the Python type of the input to
-	compress() is not encoded.
+	The dst argument can be an optional bytearray which will have the output appended.
+	If it's None, a new bytearray is created.
 
-	The value of with_size must match the value given when s was generated
-	by compress().
+	The output bytearray is returned.
 	"""
 
 	src = 0
-	dstSize = 0
-	if with_size:
-		dstSize, dlen = decompressed_size(s)
-		if dstSize < 0:
-			return None
-		print("Extracted size %u, encoded in %u bytes" % (dstSize, dlen))
-		s = s[dlen:]
-		print("Starting decompress, new size is %u" % len(s))
-
-	dst = bytearray()
+	if dst is None: dst = bytearray()
 	copymask = 1 << (NBBY - 1)
 	while src < len(s):
 		copymask <<= 1
@@ -220,8 +220,10 @@ if __name__ == "__main__":
 				continue
 			print "Loaded %u bytes from '%s'" % (len(data), a)
 			if mode == COMPRESS:
-				save(outname, compress(data, True))
+				dst = encode_size(len(data))
+				save(outname, compress(data, dst))
 			elif mode == DECOMPRESS:
-				save(outname, decompress(data, True))
+				size, slen = decode_size(data)
+				save(outname, decompress(data[slen:]))
 			else:
 				loop(data)
