@@ -137,9 +137,7 @@ def decompress(s, dst = None):
 		copymask <<= 1
 		if copymask == (1 << NBBY):
 			copymask = 1
-#			print("reading copymap at %u" % src)
 			copymap = s[src]
-#			print(" got 0x%02x" % copymap)
 			src += 1
 		if copymap & copymask:
 			mlen = (s[src] >> (NBBY - MATCH_BITS)) + MATCH_MIN
@@ -148,16 +146,13 @@ def decompress(s, dst = None):
 			cpy = len(dst) - offset
 			if cpy < 0:
 				return None
-#			print("src=%lu: %u from cpy=%lu to dst=%lu" % (src, mlen, cpy, len(dst)));
 			while mlen > 0:
 				dst.append(dst[cpy])
 				cpy += 1
 				mlen -= 1
 		else:
-#			print("src=%lu: 1 to dst=%lu" % (src, len(dst)));
 			dst.append(s[src])
 			src += 1
-#	print("decompressed %u, src=%u, input %u" % (len(dst), src, len(s)))
 	return dst
 
 
