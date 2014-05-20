@@ -55,45 +55,37 @@ The package's API is extremely simple.
 Data is managed as Python [`bytearray`](https://docs.python.org/2.7/library/functions.html#bytearray) objects.
 
 <dl>
-<dt>`lzjb.compress(s, dst = None)`</dt>
+<dt><code>lzjb.compress(s, dst = None)</code></dt>
 <dd>
-Compresses the source bytearray `s`.
-Accepts an optional `dst` destination bytearray.
+Compresses the source bytearray <code>s</code>.
+Accepts an optional <code>dst</code> destination bytearray.
 If no destination is given, a new bytearray is allocated.
 The destination is returned.
 No header of any kind is emitted into the destination.
 </dd>
 
-<dt>`lzjb.decompress(s, dst = None)`</dt>
+<dt><code>lzjb.decompress(s, dst = None)</code></dt>
 <dd>
-Decompresses the source bytearray `s`.
-Accepts an optional `dst` destination bytearray.
+Decompresses the source bytearray <code>s</code>.
+Accepts an optional <code>dst</code> destination bytearray.
 If no destination is given, a new bytearray is allocated.
 The destination is returned.
 No header of any kind is expected in the source.
 </dd>
 
-<dt>`lzjb.encode_size(size, dst = None)`</dt>
+<dt><code>lzjb.encode_size(size, dst = None)</code></dt>
 <dd>
-Encodes the given `size` into a bytearray.
-Accepts an optional `dst` destination bytearray.
+Encodes the given <code>size</code> into a bytearray.
+Accepts an optional <code>dst</code> destination bytearray.
 If no destination is given, a new bytearray is allocated.
 The destination is returned.
 </dd>
 
-<dt>`lzjb.decode_size(s)`</dt>
+<dt><code>lzjb.decode_size(s)</code></dt>
 <dd>
 Decodes a size from a bytearray.
-Returns a tuple `(size, count)` where `size` is the size that was decoded and `count` is the number of bytes it occupied.
-The remaining data, if any, is thus `s[count:]`.
+Returns a tuple <code>(size, count)</code> where <code>size</code> is the size that was decoded and <code>count</code> is the number of bytes it occupied.
+The remaining data, if any, is thus <code>s[count:]</code>.
 </dd>
 
 </dl>
-
-To compress a bytearray, call `lzjb.compress()`.
-This returns a new bytearray holding the compressed data.
-
-There are two things you can do with a bytearray of compressed data:
-
-1. Decompress it, using `lzjb.decompress()`.
-2. Find out about its decompressed size, and the header length, using `lzjb.decompressed_size()`.
