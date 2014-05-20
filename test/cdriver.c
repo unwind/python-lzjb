@@ -161,6 +161,8 @@ int main(int argc, char *argv[])
 				mode = COMPRESS;
 			else if(argv[i][1] == 'x')
 				mode = DECOMPRESS;
+			else if(argv[i][1] == 'q')
+				;	/* Ignore quiet option; we're quiet by default. */
 			else
 			{
 				fprintf(stderr, "**Unknown option '%s', aborting.\n", argv[i]);
