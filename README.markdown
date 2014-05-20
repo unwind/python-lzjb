@@ -34,7 +34,7 @@ Tests
 -----
 To ensure compatibility with the public C code for LZJB compression, automatic testing is performed.
 A simple shell script runs python-lzjb against both the C code and itself, on a set of 30 files.
-The test script emits a simple matrix which quickly shows when something breaks.
+The test script emits [a simple matrix](https://github.com/unwind/python-lzjb/blob/master/test/test-results.txt) which quickly shows when something breaks.
 
 
 Python compatibility
