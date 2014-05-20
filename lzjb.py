@@ -31,6 +31,7 @@ NBBY = 8
 MATCH_BITS = 6
 MATCH_MIN = 3
 MATCH_MAX = (1 << MATCH_BITS) + (MATCH_MIN - 1)
+MATCH_RANGE = range(MATCH_MIN, MATCH_MAX)
 OFFSET_MASK = (1 << (16 - MATCH_BITS)) - 1
 LEMPEL_SIZE = 1024
 
@@ -107,7 +108,7 @@ def compress(s, dst = None):
 		cpy = src - offset
 		if cpy >= 0 and cpy != src and s[src:src + 3] == s[cpy:cpy + 3]:
 			dst[copymap] |= copymask
-			for mlen in range(MATCH_MIN, MATCH_MAX):
+			for mlen in MATCH_RANGE:
 				if s[src + mlen] != s[cpy + mlen]:
 					break
 			dst.append(((mlen - MATCH_MIN) << (NBBY - MATCH_BITS)) | (offset >> NBBY))
