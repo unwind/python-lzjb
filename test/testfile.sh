@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Test script for python-lzjb. Compresses and decompresses a single file
 # using configurable programs. Handy to test interoperability.
@@ -10,6 +11,12 @@
 #
 # Tool names are assumed to use relative path, and to accept the
 # -o, -c and -x options to set output and to compress/decompress.
+#
+# Part of python-lzjb by Emil Brink.
+#
+# Copyright (c) 2014, Emil Brink
+# All rights reserved.
+#
 
 TMPDIR=/tmp
 

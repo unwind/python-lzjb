@@ -1,7 +1,8 @@
 /*
  * This code is part of python-lzjb by Emil Brink.
  *
- *
+ * Copyright (c) 2014, Emil Brink
+ * All rights reserved.
 */
 
 #include <stdbool.h>

@@ -5,7 +5,7 @@
 
 from distutils.core import setup
 setup(name = 'lzjb',
-	version = '0.1',
+	version = '1.0',
 	description = "A pure Python implementation of LZJB compression/decompression",
 	author = "Emil Brink",
 	author_email = "emil@obsession.se",

@@ -1,5 +1,11 @@
+#!/usr/bin/env bash
 #
 # testrunner.sh - Runs testfile.sh on a bunch of files.
+#
+# Part of python-lzjb by Emil Brink.
+#
+# Copyright (c) 2014, Emil Brink
+# All rights reserved.
 #
 
 PYDRIVER=../lzjb.py
