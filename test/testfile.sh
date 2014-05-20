@@ -22,15 +22,13 @@ shift
 for f in $*
 do
 	BASE=$(basename $f)
-#	echo "Compressing ${BASE} ..."
 	TMPF=${TMPDIR}/${BASE}
 	$COMPRESSOR   -o${TMPF}.lzjb -c $f
-#	echo "Decompressing ..."
 	$DECOMPRESSOR -o${TMPF}.orig -x ${TMPF}.lzjb
 	if cmp $f ${TMPF}.orig; then
-		echo "${f}: SUCCESS"
+		echo -n "OK"
 		rm -f ${TMPF}.{lzjb,orig}
 	else
-		echo "${f}: FAILED"
+		echo -n "FAIL"
 	fi
 done

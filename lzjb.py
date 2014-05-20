@@ -146,7 +146,6 @@ def decompress(s, dst = None):
 			src += 2
 			cpy = len(dst) - offset
 			if cpy < 0:
-				print("got offset=%d at %u -> cpy=%d which is hard" % (offset, len(dst), cpy))
 				return None
 #			print("src=%lu: %u from cpy=%lu to dst=%lu" % (src, mlen, cpy, len(dst)));
 			while mlen > 0:
@@ -192,6 +191,7 @@ if __name__ == "__main__":
 	COMPRESS = 1
 	mode = None
 	outname = None
+	quiet = False
 
 	profile = False
 	for a in sys.argv[1:]:
@@ -208,6 +208,8 @@ if __name__ == "__main__":
 				mode = DECOMPRESS
 				if outname is None:
 					print("**Use -oNAME to set output name, before -x")
+			elif a[1:] == "q":
+				quiet = True
 			else:
 				print("**Ignoring unknown option '%s'" % a)
 		else:
@@ -219,7 +221,7 @@ if __name__ == "__main__":
 			except:
 				print("**Failed to open '%s'" % a)
 				continue
-			print("Loaded %u bytes from '%s'" % (len(data), a))
+			if not quiet: print("Loaded %u bytes from '%s'" % (len(data), a))
 			if mode == COMPRESS:
 				dst = encode_size(len(data))
 				save(outname, compress(data, dst))

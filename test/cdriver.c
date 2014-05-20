@@ -101,8 +101,9 @@ static const void * size_get(const void *buffer, size_t *size)
 	return get;
 }
 
-static void compress(const char *filename, const char *outname)
+static bool compress(const char *filename, const char *outname)
 {
+	bool ok = false;
 	size_t in_size;
 	void *in = load_file(filename, &in_size);
 	if(in != NULL)
@@ -115,16 +116,17 @@ static void compress(const char *filename, const char *outname)
 			size_t out_size = (uchar_t * ) put - (uchar_t *) out;
 			const size_t out_left = out_max - ((unsigned char *) put - (unsigned char *) out);
 			out_size += lzjb_compress(in, put, in_size, out_left, 0);
-			if(save_file(outname, out, out_size))
-				printf("%-20s %zu -> %zu [%.1f%%]\n", filename, in_size, out_size, 100.f * out_size / in_size);
+			ok = save_file(outname, out, out_size);
 			free(out);
 		}
 		free(in);
 	}
+	return ok;
 }
 
-static void decompress(const char *filename, const char *outname)
+static bool decompress(const char *filename, const char *outname)
 {
+	bool ok = false;
 	size_t in_size;
 	void *in = load_file(filename, &in_size);
 	if(in != NULL)
@@ -135,20 +137,21 @@ static void decompress(const char *filename, const char *outname)
 		if(out != NULL)
 		{
 			lzjb_decompress(get, out, in_size, out_size, 0);
-			if(save_file(outname, out, out_size))
-				printf("%-20s %zu -> %zu [%.1f%%]\n", filename, in_size, out_size, 100.f * in_size / out_size);
+			ok = save_file(outname, out, out_size);
 			free(out);
 		}
 		free(in);
 	}
+	return ok;
 }
 
 int main(int argc, char *argv[])
 {
 	enum { DECOMPRESS, COMPRESS } mode = COMPRESS;
 	const char *outname = NULL;
+	bool ok = true;
 
-	for(int i = 1; argv[i] != NULL; ++i)
+	for(int i = 1; ok && argv[i] != NULL; ++i)
 	{
 		if(argv[i][0] == '-')
 		{
@@ -165,9 +168,9 @@ int main(int argc, char *argv[])
 			}
 		}
 		else if(mode == COMPRESS)
-			compress(argv[i], outname);
+			ok = compress(argv[i], outname);
 		else if(mode == DECOMPRESS)
-			decompress(argv[i], outname);
+			ok = decompress(argv[i], outname);
 	}
-	return EXIT_SUCCESS;
+	return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
