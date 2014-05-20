@@ -23,8 +23,8 @@ for f in $*
 do
 	BASE=$(basename $f)
 	TMPF=${TMPDIR}/${BASE}
-	$COMPRESSOR   -o${TMPF}.lzjb -c $f
-	$DECOMPRESSOR -o${TMPF}.orig -x ${TMPF}.lzjb
+	$COMPRESSOR   -q -o${TMPF}.lzjb -c $f
+	$DECOMPRESSOR -q -o${TMPF}.orig -x ${TMPF}.lzjb
 	if cmp $f ${TMPF}.orig; then
 		echo -n "OK"
 		rm -f ${TMPF}.{lzjb,orig}
