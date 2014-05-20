@@ -23,13 +23,25 @@ This was ported to Python based on:
 
 Status
 ------
-It's very early days for this code.
-There is a lot of work to be done to bring this into anything near "production quality":
+It's early days for this code.
+There is some work to be done to bring this into anything near "production quality":
 
 - Proper Python packaging (setup.py, and so on).
-- Test framework (including two-way testing against the C code).
 - More profiling and optimization.
-- An idea about Python 2.x/3.x compatibility and targeting; currently written against 2.7.6.
+
+
+Tests
+-----
+To ensure compatibility with the public C code for LZJB compression, automatic testing is performed.
+A simple shell script runs python-lzjb against both the C code and itself, on a set of 30 files.
+The test script emits a simple matrix which quickly shows when something breaks.
+
+
+Python compatibility
+--------------------
+This package is designed to work with both Python 2.x and 3.x from the same source.
+It has been tested on Python 2.7.6 and Python 3.4, by running the test script.
+
 
 Performance
 -----------
