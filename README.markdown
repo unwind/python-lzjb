@@ -52,7 +52,43 @@ On my not-so-hot laptop (Intel® Core™ i5 M 480 @ 2.67GHz) it currently achiev
 API
 ===
 The package's API is extremely simple.
-Data is managed as Python [`bytearray`](https://docs.python.org/2.7/library/functions.html#bytearray).
+Data is managed as Python [`bytearray`](https://docs.python.org/2.7/library/functions.html#bytearray) objects.
+
+<dl>
+<dt>`lzjb.compress(s, dst = None)`</dt>
+<dd>
+Compresses the source bytearray `s`.
+Accepts an optional `dst` destination bytearray.
+If no destination is given, a new bytearray is allocated.
+The destination is returned.
+No header of any kind is emitted into the destination.
+</dd>
+
+<dt>`lzjb.decompress(s, dst = None)`</dt>
+<dd>
+Decompresses the source bytearray `s`.
+Accepts an optional `dst` destination bytearray.
+If no destination is given, a new bytearray is allocated.
+The destination is returned.
+No header of any kind is expected in the source.
+</dd>
+
+<dt>`lzjb.encode_size(size, dst = None)`</dt>
+<dd>
+Encodes the given `size` into a bytearray.
+Accepts an optional `dst` destination bytearray.
+If no destination is given, a new bytearray is allocated.
+The destination is returned.
+</dd>
+
+<dt>`lzjb.decode_size(s)`</dt>
+<dd>
+Decodes a size from a bytearray.
+Returns a tuple `(size, count)` where `size` is the size that was decoded and `count` is the number of bytes it occupied.
+The remaining data, if any, is thus `s[count:]`.
+</dd>
+
+</dl>
 
 To compress a bytearray, call `lzjb.compress()`.
 This returns a new bytearray holding the compressed data.
