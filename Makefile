@@ -6,9 +6,6 @@
 
 # ----------------------------------------------------------------------
 
-README:		README.md
-		ln -fs $^ $@
-
 README.md:	README-header.md API.html README-footer.md
 		cat $^  >$@
 
