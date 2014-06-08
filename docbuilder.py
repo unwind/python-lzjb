@@ -9,6 +9,8 @@
 # Written in June 2014 by Emil Brink <emil@obsession.se>. Public domain.
 #
 
+import sys
+
 def doc_callable(obj):
 	"""Documents obj, which we've already determined is callable."""
 	code = obj.func_code
@@ -46,4 +48,13 @@ def doc_package(package, methods):
 
 
 if __name__ == "__main__":
-	doc_package("lzjb", [("Size-encoding", "encode_size", "decode_size"), ("Data compression", "compress", "decompress")])
+	if len(sys.argv) >= 3:
+		package = sys.argv[1]
+		# Expect remaining arguments to be list of category-prefixed function names ("category:f1,f2,f3").
+		methods = []
+		for a in sys.argv[2:]:
+			cat = a.find(":")
+			if cat > 0:
+				methods.append(tuple([a[:cat],] + a[cat + 1:].split(",")))
+		if len(methods) > 0:
+			doc_package(package, methods)
