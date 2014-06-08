@@ -27,6 +27,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+
 NBBY = 8
 MATCH_BITS = 6
 MATCH_MIN = 3
@@ -36,11 +37,14 @@ OFFSET_MASK = (1 << (16 - MATCH_BITS)) - 1
 LEMPEL_SIZE = 1024
 
 
-def encode_size(size, dst = None):
+def size_encode(size, dst = None):
 	"""
 	Encodes the given size in little-endian variable-length encoding.
 
-	The dst argument can be an existing bytearray to append the size.
+	The dst argument can be an existing bytearray to append the size. If it's
+	omitted (or None), a new bytearray is created and used.
+
+	Returns the destination bytearray.
 	"""
 	if not dst: dst = bytearray()
 	done = False
@@ -52,31 +56,31 @@ def encode_size(size, dst = None):
 	return dst
 
 
-def decode_size(s):
+def size_decode(src):
 	"""
-	Decodes a size (encoded with encode_size()) from the start of s.
+	Decodes a size (encoded with size_encode()) from the start of src.
 
 	Returns a tuple (size, len) where size is the size that was decoded,
-	and len is the number of bytes from s that were consumed.
+	and len is the number of bytes from src that were consumed.
 	"""
 	dstSize = 0
-	src = 0
+	pos = 0
 	# Extract prefixed encoded size, if present.
 	val = 1
 	while True:
-		c = s[src]
-		src += 1
+		c = src[pos]
+		pos += 1
 		if c & 0x80:
 			dstSize += val * (c & 0x7f)
 			break
 		dstSize += val * c
 		val <<= 7
-	return (dstSize, src)
+	return (dstSize, pos)
 
 
-def compress(s, dst = None):
+def compress(src, dst = None):
 	"""
-	Compresses s, the source bytearray.
+	Compresses src, the source bytearray.
 
 	If dst is not None, it's assumed to be the output bytearray and bytes are appended to it.
 	If it is None, a new bytearray is created.
@@ -88,41 +92,41 @@ def compress(s, dst = None):
 
 	lempel = [0] * LEMPEL_SIZE
 	copymask = 1 << (NBBY - 1)
-	src = 0 # Current input offset.
-	while src < len(s):
+	pos = 0 # Current input offset.
+	while pos < len(src):
 		copymask <<= 1
 		if copymask == (1 << NBBY):
 			copymask = 1
 			copymap = len(dst)
 			dst.append(0)
-		if src > len(s) - MATCH_MAX:
-			dst.append(s[src])
-			src += 1
+		if pos > len(src) - MATCH_MAX:
+			dst.append(src[pos])
+			pos += 1
 			continue
-		hsh = (s[src] << 16) + (s[src + 1] << 8) + s[src + 2]
+		hsh = (src[pos] << 16) + (src[pos + 1] << 8) + src[pos + 2]
 		hsh += hsh >> 9
 		hsh += hsh >> 5
 		hsh &= LEMPEL_SIZE - 1
-		offset = (src - lempel[hsh]) & OFFSET_MASK
-		lempel[hsh] = src
-		cpy = src - offset
-		if cpy >= 0 and cpy != src and s[src:src + 3] == s[cpy:cpy + 3]:
+		offset = (pos - lempel[hsh]) & OFFSET_MASK
+		lempel[hsh] = pos
+		cpy = pos - offset
+		if cpy >= 0 and cpy != pos and src[pos:pos + 3] == src[cpy:cpy + 3]:
 			dst[copymap] |= copymask
 			for mlen in MATCH_RANGE:
-				if s[src + mlen] != s[cpy + mlen]:
+				if src[pos + mlen] != src[cpy + mlen]:
 					break
 			dst.append(((mlen - MATCH_MIN) << (NBBY - MATCH_BITS)) | (offset >> NBBY))
 			dst.append(offset & 255)
-			src += mlen
+			pos += mlen
 		else:
-			dst.append(s[src])
-			src += 1
+			dst.append(src[pos])
+			pos += 1
 	return dst
 
 
-def decompress(s, dst = None):
+def decompress(src, dst = None):
 	"""
-	Decompresses a bytearray of compressed data.
+	Decompresses src, a bytearray of compressed data.
 
 	The dst argument can be an optional bytearray which will have the output appended.
 	If it's None, a new bytearray is created.
@@ -130,19 +134,19 @@ def decompress(s, dst = None):
 	The output bytearray is returned.
 	"""
 
-	src = 0
+	pos = 0
 	if dst is None: dst = bytearray()
 	copymask = 1 << (NBBY - 1)
-	while src < len(s):
+	while pos < len(src):
 		copymask <<= 1
 		if copymask == (1 << NBBY):
 			copymask = 1
-			copymap = s[src]
-			src += 1
+			copymap = src[pos]
+			pos += 1
 		if copymap & copymask:
-			mlen = (s[src] >> (NBBY - MATCH_BITS)) + MATCH_MIN
-			offset = ((s[src] << NBBY) | s[src + 1]) & OFFSET_MASK
-			src += 2
+			mlen = (src[pos] >> (NBBY - MATCH_BITS)) + MATCH_MIN
+			offset = ((src[pos] << NBBY) | src[pos + 1]) & OFFSET_MASK
+			pos += 2
 			cpy = len(dst) - offset
 			if cpy < 0:
 				return None
@@ -151,8 +155,8 @@ def decompress(s, dst = None):
 				cpy += 1
 				mlen -= 1
 		else:
-			dst.append(s[src])
-			src += 1
+			dst.append(src[pos])
+			pos += 1
 	return dst
 
 
@@ -219,10 +223,10 @@ if __name__ == "__main__":
 				continue
 			if not quiet: print("Loaded %u bytes from '%s'" % (len(data), a))
 			if mode == COMPRESS:
-				dst = encode_size(len(data))
+				dst = size_encode(len(data))
 				save(outname, compress(data, dst))
 			elif mode == DECOMPRESS:
-				size, slen = decode_size(data)
+				size, slen = size_decode(data)
 				save(outname, decompress(data[slen:]))
 			else:
 				loop(data)
