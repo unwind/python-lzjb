@@ -10,7 +10,7 @@ README.md:	README-header.md API.html README-footer.md
 		cat $^  >$@
 
 API.html:	lzjb.py docbuilder.py
-		./docbuilder.py lzjb "Size encoding:encode_size,decode_size" "Data compression:compress,decompress" > $@
+		./docbuilder.py lzjb "Size encoding:size_encode,size_decode" "Data compression:compress,decompress" > $@
 
 # ----------------------------------------------------------------------
 

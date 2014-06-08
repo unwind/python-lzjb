@@ -57,41 +57,6 @@ Data is managed as Python [`bytearray`](https://docs.python.org/2.7/library/func
 
 ##Size encoding##
 <dl>
-<dt><tt>encode_size(size, dst = None)</tt></dt>
-<dd>
-	Encodes the given size in little-endian variable-length encoding.
-
-	The dst argument can be an existing bytearray to append the size.
-	</dd>
-<dt><tt>decode_size(s)</tt></dt>
-<dd>
-	Decodes a size (encoded with encode_size()) from the start of s.
-
-	Returns a tuple (size, len) where size is the size that was decoded,
-	and len is the number of bytes from s that were consumed.
-	</dd>
-</dl>
-##Data compression##
-<dl>
-<dt><tt>compress(s, dst = None)</tt></dt>
-<dd>
-	Compresses s, the source bytearray.
-
-	If dst is not None, it's assumed to be the output bytearray and bytes are appended to it.
-	If it is None, a new bytearray is created.
-
-	The destination bytearray is returned.
-	</dd>
-<dt><tt>decompress(s, dst = None)</tt></dt>
-<dd>
-	Decompresses a bytearray of compressed data.
-
-	The dst argument can be an optional bytearray which will have the output appended.
-	If it's None, a new bytearray is created.
-
-	The output bytearray is returned.
-	</dd>
-</dl>
 
 Original Code
 -------------
