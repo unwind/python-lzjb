@@ -35,7 +35,6 @@ def doc_object(obj):
 def doc_package(package, methods, path_prefix = None):
 	if not path_prefix is None:
 		sys.path = [path_prefix] + sys.path
-		print "path set to '%s'" % sys.path
 
 	temp = __import__(package)
 	for g in methods:
