@@ -26,7 +26,10 @@ def doc_callable(obj):
 		else:
 			args.append("%s = %s" % (argnames[i], defs[i - fd]))
 	print "<dt><tt>%s(%s)</tt></dt>" % (name, ", ".join(list(args)))
-	print "<dd>%s</dd>" % obj.__doc__
+	# Process main documentation text, emitting paragraphs.
+	paras = obj.__doc__.split("\n\n")
+	for p in paras:
+		print "<p>%s</p>" % p.strip()
 
 def doc_object(obj):
 	if hasattr(obj, "__call__"):
@@ -35,8 +38,8 @@ def doc_object(obj):
 def doc_package(package, methods, path_prefix = None):
 	if not path_prefix is None:
 		sys.path = [path_prefix] + sys.path
-
 	temp = __import__(package)
+
 	for g in methods:
 		if g[0] is not None:
 			print "##%s##" % g[0]

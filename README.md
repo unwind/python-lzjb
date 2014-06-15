@@ -55,46 +55,30 @@ API
 The package's API is extremely simple.
 Data is managed as Python [`bytearray`](https://docs.python.org/2.7/library/functions.html#bytearray) objects.
 
-path set to '['..', '/home/emil/data/workspace/python-lzjb/doc', '/usr/lib/python2.7', '/usr/lib/python2.7/plat-x86_64-linux-gnu', '/usr/lib/python2.7/lib-tk', '/usr/lib/python2.7/lib-old', '/usr/lib/python2.7/lib-dynload', '/home/emil/.local/lib/python2.7/site-packages', '/usr/local/lib/python2.7/dist-packages', '/usr/lib/python2.7/dist-packages', '/usr/lib/python2.7/dist-packages/PILcompat', '/usr/lib/python2.7/dist-packages/gst-0.10', '/usr/lib/python2.7/dist-packages/gtk-2.0', '/usr/lib/pymodules/python2.7', '/usr/lib/python2.7/dist-packages/ubuntu-sso-client']'
 ##Size encoding##
 <dl>
 <dt><tt>size_encode(size, dst = None)</tt></dt>
-<dd>
-	Encodes the given size in little-endian variable-length encoding.
-
-	The dst argument can be an existing bytearray to append the size. If it's
-	omitted (or None), a new bytearray is created and used.
-
-	Returns the destination bytearray.
-	</dd>
+<p>Encodes the given size in little-endian variable-length encoding.</p>
+<p>The dst argument can be an existing bytearray to append the size. If it's
+	omitted (or None), a new bytearray is created and used.</p>
+<p>Returns the destination bytearray.</p>
 <dt><tt>size_decode(src)</tt></dt>
-<dd>
-	Decodes a size (encoded with size_encode()) from the start of src.
-
-	Returns a tuple (size, len) where size is the size that was decoded,
-	and len is the number of bytes from src that were consumed.
-	</dd>
+<p>Decodes a size (encoded with size_encode()) from the start of src.</p>
+<p>Returns a tuple (size, len) where size is the size that was decoded,
+	and len is the number of bytes from src that were consumed.</p>
 </dl>
 ##Data compression##
 <dl>
 <dt><tt>compress(src, dst = None)</tt></dt>
-<dd>
-	Compresses src, the source bytearray.
-
-	If dst is not None, it's assumed to be the output bytearray and bytes are appended to it.
-	If it is None, a new bytearray is created.
-
-	The destination bytearray is returned.
-	</dd>
+<p>Compresses src, the source bytearray.</p>
+<p>If dst is not None, it's assumed to be the output bytearray and bytes are appended to it.
+	If it is None, a new bytearray is created.</p>
+<p>The destination bytearray is returned.</p>
 <dt><tt>decompress(src, dst = None)</tt></dt>
-<dd>
-	Decompresses src, a bytearray of compressed data.
-
-	The dst argument can be an optional bytearray which will have the output appended.
-	If it's None, a new bytearray is created.
-
-	The output bytearray is returned.
-	</dd>
+<p>Decompresses src, a bytearray of compressed data.</p>
+<p>The dst argument can be an optional bytearray which will have the output appended.
+	If it's None, a new bytearray is created.</p>
+<p>The output bytearray is returned.</p>
 </dl>
 
 Original Code
