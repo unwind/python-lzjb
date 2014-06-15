@@ -1,18 +1,17 @@
 #
-# Simplistic Makefile to build the README, by running docbuilder to extract Python docstrings.
+# Top-level makefile for python-lzjb.
+#
+# This doesn't do a whole lot.
 #
 
-.PHONY:	clean
+.PHONY:	doc dist
 
 # ----------------------------------------------------------------------
 
-README.md:	README-header.md API.html README-footer.md
-		cat $^  >$@
-
-API.html:	lzjb.py docbuilder.py Makefile
-		./docbuilder.py lzjb "Size encoding:size_encode,size_decode" "Data compression:compress,decompress" > $@
+doc:
+	cd doc && make
 
 # ----------------------------------------------------------------------
 
-clean:
-	rm -f README README.md API.htm
+dist:
+	python ./setup.py sdist
