@@ -55,3 +55,8 @@ API
 The package's API is extremely simple.
 Data is managed as Python [`bytearray`](https://docs.python.org/2.7/library/functions.html#bytearray) objects.
 
+There are two groups of functions: size encoding/decoding, and data compression/decompression.
+
+The size functions are mainly intended to help with creating suitable header data for compressed data.
+They support a simple variable-length integer encoding format which can be used to prepend compressed data with the size of the uncompressed, original, data.
+The compression/decompressions themselves do not support or expect any header data, that is up to the application to provide.
