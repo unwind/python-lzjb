@@ -14,6 +14,7 @@ I know of the [pylzjb](https://code.google.com/p/pylzjb/) project, which provide
 Status
 ------
 This code is starting to feel quite mature and polished.
+This feeling is helped by the fact that it's very short, the core functions occupy less than 150 lines, including docstrings.
 The only thing I can think of to do would be more profiling/optimization, but it does seem to *work* already.
 
 
@@ -60,6 +61,9 @@ There are two groups of functions: size encoding/decoding, and data compression/
 The size functions are mainly intended to help with creating suitable header data for compressed data.
 They support a simple variable-length integer encoding format which can be used to prepend compressed data with the size of the uncompressed, original, data.
 The compression/decompressions themselves do not support or expect any header data, that is up to the application to provide.
+
+The text below is extracted from the source code's docstrings by the [`docbuilder.py`](https://github.com/unwind/python-lzjb/blob/master/doc/docbuilder.py) program.
+
 ##Size encoding##
 <dl>
 <dt><tt>size_encode(size, dst = None)</tt></dt>
@@ -86,8 +90,8 @@ The compression/decompressions themselves do not support or expect any header da
 <p>The output bytearray is returned.</p>
 </dl>
 
-Original Code
--------------
+Inspiration
+-----------
 This was ported to Python based on:
 - [The original C code](http://web.archive.org/web/20100807223517/http://cvs.opensolaris.org/source/xref/onnv/onnv-gate/usr/src/uts/common/fs/zfs/lzjb.c)
 - [The JavaScript port](https://code.google.com/p/jslzjb/source/browse/trunk/Iuppiter.js), which adds the inclusion of the uncompressed data size as a prefix

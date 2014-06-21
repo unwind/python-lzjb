@@ -14,6 +14,7 @@ I know of the [pylzjb](https://code.google.com/p/pylzjb/) project, which provide
 Status
 ------
 This code is starting to feel quite mature and polished.
+This feeling is helped by the fact that it's very short, the core functions occupy less than 150 lines, including docstrings.
 The only thing I can think of to do would be more profiling/optimization, but it does seem to *work* already.
 
 
@@ -60,3 +61,6 @@ There are two groups of functions: size encoding/decoding, and data compression/
 The size functions are mainly intended to help with creating suitable header data for compressed data.
 They support a simple variable-length integer encoding format which can be used to prepend compressed data with the size of the uncompressed, original, data.
 The compression/decompressions themselves do not support or expect any header data, that is up to the application to provide.
+
+The text below is extracted from the source code's docstrings by the [`docbuilder.py`](https://github.com/unwind/python-lzjb/blob/master/doc/docbuilder.py) program.
+
