@@ -6,7 +6,7 @@
 #
 # ---------------------------------------------------------------------
 #
-# Copyright (c) 2014, Emil Brink
+# Copyright (c) 2014-2015, Emil Brink
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided
@@ -32,7 +32,7 @@ NBBY = 8
 MATCH_BITS = 6
 MATCH_MIN = 3
 MATCH_MAX = (1 << MATCH_BITS) + (MATCH_MIN - 1)
-MATCH_RANGE = range(MATCH_MIN, MATCH_MAX)
+MATCH_RANGE = range(MATCH_MIN, MATCH_MAX + 1)
 OFFSET_MASK = (1 << (16 - MATCH_BITS)) - 1
 LEMPEL_SIZE = 1024
 
@@ -82,7 +82,7 @@ def compress(src, dst = None):
 	"""
 	Compresses src, the source bytearray.
 
-	If dst is not None, it's assumed to be the output bytearray and bytes are appended to it.
+	If dst is not None, it's assumed to be the output bytearray and bytes are appended to it using dst.append().
 	If it is None, a new bytearray is created.
 
 	The destination bytearray is returned.

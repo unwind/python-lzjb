@@ -80,7 +80,7 @@ The text below is extracted from the source code's docstrings by the [`docbuilde
 <dl>
 <dt><tt>compress(src, dst = None)</tt></dt>
 <p>Compresses src, the source bytearray.</p>
-<p>If dst is not None, it's assumed to be the output bytearray and bytes are appended to it.
+<p>If dst is not None, it's assumed to be the output bytearray and bytes are appended to it using dst.append().
 	If it is None, a new bytearray is created.</p>
 <p>The destination bytearray is returned.</p>
 <dt><tt>decompress(src, dst = None)</tt></dt>
