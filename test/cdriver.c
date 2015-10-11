@@ -133,11 +133,11 @@ static bool decompress(const char *filename, const char *outname)
 	if(in != NULL)
 	{
 		size_t out_size;
-		void *get = (void *) size_get(in, &out_size);
+		const void *get = size_get(in, &out_size);
 		void *out = malloc(out_size);
 		if(out != NULL)
 		{
-			lzjb_decompress(get, out, in_size, out_size, 0);
+			lzjb_decompress((void *) get, out, in_size, out_size, 0);
 			ok = save_file(outname, out, out_size);
 			free(out);
 		}
