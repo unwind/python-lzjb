@@ -6,7 +6,7 @@
 #
 # ---------------------------------------------------------------------
 #
-# Copyright (c) 2014-2015, Emil Brink
+# Copyright (c) 2014-2016, Emil Brink
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided
@@ -28,11 +28,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-NBBY = 8
+BYTE_BITS = 8
 MATCH_BITS = 6
 MATCH_MIN = 3
 MATCH_MAX = (1 << MATCH_BITS) + (MATCH_MIN - 1)
-MATCH_RANGE = range(MATCH_MIN, MATCH_MAX + 1)
+MATCH_RANGE = range(MATCH_MIN, MATCH_MAX + 1)	# Length 64, fine on 2.x.
 OFFSET_MASK = (1 << (16 - MATCH_BITS)) - 1
 LEMPEL_SIZE = 1024
 
@@ -46,7 +46,7 @@ def size_encode(size, dst = None):
 
 	Returns the destination bytearray.
 	"""
-	if not dst: dst = bytearray()
+	if dst is None: dst = bytearray()
 	done = False
 	while not done:
 		dst.append(size & 0x7f)
@@ -91,11 +91,11 @@ def compress(src, dst = None):
 	if dst is None: dst = bytearray()
 
 	lempel = [0] * LEMPEL_SIZE
-	copymask = 1 << (NBBY - 1)
+	copymask = 1 << (BYTE_BITS - 1)
 	pos = 0 # Current input offset.
 	while pos < len(src):
 		copymask <<= 1
-		if copymask == (1 << NBBY):
+		if copymask == (1 << BYTE_BITS):
 			copymask = 1
 			copymap = len(dst)
 			dst.append(0)
@@ -115,7 +115,7 @@ def compress(src, dst = None):
 			for mlen in MATCH_RANGE:
 				if src[pos + mlen] != src[cpy + mlen]:
 					break
-			dst.append(((mlen - MATCH_MIN) << (NBBY - MATCH_BITS)) | (offset >> NBBY))
+			dst.append(((mlen - MATCH_MIN) << (BYTE_BITS - MATCH_BITS)) | (offset >> BYTE_BITS))
 			dst.append(offset & 255)
 			pos += mlen
 		else:
@@ -134,18 +134,18 @@ def decompress(src, dst = None):
 	The output bytearray is returned.
 	"""
 
-	pos = 0
 	if dst is None: dst = bytearray()
-	copymask = 1 << (NBBY - 1)
+	pos = 0
+	copymask = 1 << (BYTE_BITS - 1)
 	while pos < len(src):
 		copymask <<= 1
-		if copymask == (1 << NBBY):
+		if copymask == (1 << BYTE_BITS):
 			copymask = 1
 			copymap = src[pos]
 			pos += 1
 		if copymap & copymask:
-			mlen = (src[pos] >> (NBBY - MATCH_BITS)) + MATCH_MIN
-			offset = ((src[pos] << NBBY) | src[pos + 1]) & OFFSET_MASK
+			mlen = (src[pos] >> (BYTE_BITS - MATCH_BITS)) + MATCH_MIN
+			offset = ((src[pos] << BYTE_BITS) | src[pos + 1]) & OFFSET_MASK
 			pos += 2
 			cpy = len(dst) - offset
 			if cpy < 0:
