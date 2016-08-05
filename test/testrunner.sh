@@ -25,7 +25,7 @@ for f in $(cat $TESTFILES)
 do
 	BYTES=$(ls -l $f | cut -d ' ' -f 5)
 	SIZE=$(ls -lh $f | cut -d ' ' -f 5)
-	printf "%-30s\t%5s\t" $f $SIZE
+	printf "%-34s\t%5s\t" $f $SIZE
 	./testfile.sh $PYDRIVER $PYDRIVER $f
 	echo -e -n "\t"
 	./testfile.sh $CDRIVER  $PYDRIVER $f
