@@ -13,14 +13,15 @@ CDRIVER=./cdriver
 TESTFILES=/tmp/testfiles.txt
 
 # Collect some files to test.
-# Idea: text files from /etc, and binaries from /usr/bin.
+# Idea: text files from /etc, binaries from /usr/bin and issue-specifics from regression/.
 
-find /etc     -maxdepth 1  -type f  \! -name '.*' -readable | xargs ls -S 2>/dev/null | head -15  >$TESTFILES
-find /usr/bin -maxdepth 1  -type f                -readable | xargs ls -S 2>/dev/null | head -15 >>$TESTFILES
+find /etc       -maxdepth 1 -type f  \! -name '.*' -readable | xargs ls -S 2>/dev/null | head -15  >$TESTFILES
+find /usr/bin   -maxdepth 1 -type f                -readable | xargs ls -S 2>/dev/null | head -15 >>$TESTFILES
+find regression -maxdepth 1 -type f                -readable | xargs ls -S 2>/dev/null | head -15 >>$TESTFILES
 
 TOTBYTES=0
 
-printf "%-30s\t%5s\t%s\t%s\t%s\n" "Filename" "Size" "Py-Py" "C-Py" "Py-C"
+printf "%-34s\t%5s\t%s\t%s\t%s\n" "Filename" "Size" "Py-Py" "C-Py" "Py-C"
 for f in $(cat $TESTFILES)
 do
 	BYTES=$(ls -l $f | cut -d ' ' -f 5)

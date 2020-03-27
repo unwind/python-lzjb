@@ -6,7 +6,7 @@
 #
 # ---------------------------------------------------------------------
 #
-# Copyright (c) 2014-2016, Emil Brink
+# Copyright (c) 2014-2020, Emil Brink
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided
@@ -113,6 +113,8 @@ def compress(src, dst = None):
 		if cpy >= 0 and cpy != pos and src[pos:pos + 3] == src[cpy:cpy + 3]:
 			dst[copymap] |= copymask
 			for mlen in MATCH_RANGE:
+				if pos + mlen >= len(src):		# Protect against overflow.
+					break
 				if src[pos + mlen] != src[cpy + mlen]:
 					break
 			dst.append(((mlen - MATCH_MIN) << (BYTE_BITS - MATCH_BITS)) | (offset >> BYTE_BITS))
