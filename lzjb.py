@@ -112,9 +112,8 @@ def compress(src, dst = None):
 		cpy = pos - offset
 		if cpy >= 0 and cpy != pos and src[pos:pos + 3] == src[cpy:cpy + 3]:
 			dst[copymap] |= copymask
-			for mlen in MATCH_RANGE:
-				if pos + mlen >= len(src):		# Protect against overflow.
-					break
+			# Process the usual range if far from end of buffer, else a shorter one to avoid stepping out of bounds.
+			for mlen in MATCH_RANGE if pos + MATCH_RANGE[-1] < len(src) else range(MATCH_MIN, len(src) - pos):
 				if src[pos + mlen] != src[cpy + mlen]:
 					break
 			dst.append(((mlen - MATCH_MIN) << (BYTE_BITS - MATCH_BITS)) | (offset >> BYTE_BITS))
