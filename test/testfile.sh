@@ -14,7 +14,7 @@
 #
 # Part of python-lzjb by Emil Brink.
 #
-# Copyright (c) 2014-2015, Emil Brink
+# Copyright (c) 2014-2020, Emil Brink
 # All rights reserved.
 #
 

@@ -42,8 +42,9 @@ A simple shell script runs python-lzjb against both the C code and itself, on a 
 The test script emits [a simple matrix](https://github.com/unwind/python-lzjb/blob/master/test/test-results.txt) which quickly shows when something breaks.
 
 This package is designed to work with both Python 2.x and 3.x from the same source.
-It has been tested on Python 2.7.6 and Python 3.4, by running the test script.
-
+It has been tested on Python 2.7.17 and Python 3.7.5, by running the test script.
+The test "framework" is rather Unix-centric, apologies.
+It could/should probably be rewritten in Python to be more portable.
 
 Performance
 -----------
